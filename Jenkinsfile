@@ -4,18 +4,23 @@ pipeline {
     parameters {
         credentials credentialType: 'com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey', defaultValue: '', description: 'Kayobe SSH Key', name: 'KAYOBE_SSH_CREDS', required: true
         password defaultValue: 'SECRET', description: 'Kayobe Ansible Vault Password', name: 'KAYOBE_VAULT_PASSWORD'
-        string defaultValue: 'http://localhost:5000/', description: 'Docker Registry to push images to', name: 'DOCKER_REGISTRY', trim: true
+        string defaultValue: 'http://192.168.33.5:4000/', description: 'Docker Registry to push images to', name: 'DOCKER_REGISTRY', trim: true
+        string defaultValue: '6.0.0', description: 'Kayobe version tag to use', name: 'KAYOBE_VERSION', trim: true
+        string defaultValue: 'https://git.openstack.org/openstack/kayobe.git', description: 'Kayobe repo to use', name: 'KAYOBE_REPO', trim: true
         credentials credentialType: 'org.jenkinsci.plugins.plaincredentials.impl.FileCredentialsImpl', description: 'Kayobe SSH Config file', name: 'KAYOBE_SSH_CONFIG', required: false
     }
     environment {
         REGISTRY = "${params.DOCKER_REGISTRY}"
+        KAYOBE_VERSION = "${params.KAYOBE_VERSION}"
+        KAYOBE_REPO = "${params.KAYOBE_REPO}"
         KAYOBE_IMAGE = "${currentBuild.projectName}:${env.GIT_COMMIT}"
     }
     stages {
         stage('Build and Push') {
             steps {
                 script {
-                    def kayobeImage = docker.build("$KAYOBE_IMAGE")
+                    def kayobeImage = docker.build("$KAYOBE_IMAGE",
+		    "--build-arg kayobe_version=$KAYOBE_VERSION --build-arg kayobe_repo=$KAYOBE_REPO .")
                     docker.withRegistry("$REGISTRY") {
                         kayobeImage.push()
                         kayobeImage.push('latest')

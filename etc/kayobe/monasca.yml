@@ -1,0 +1,19 @@
+---
+###############################################################################
+# Monasca configuration.
+
+# Monasca OpenStack Project name
+#monasca_control_plane_project:
+monasca_control_plane_project: monasca
+
+# Monasca OpenStack Domain name
+#monasca_control_plane_domain:
+
+# Monasca doesn't support binary type container builds
+#monasca_install_type:
+
+# Roles which grant read/write access to Monasca APIs
+#monasca_default_authorized_roles:
+
+# Roles which grant write access to Monasca APIs
+#monasca_agent_authorized_roles:
